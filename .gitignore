@@ -1,0 +1,3 @@
+# common lisp garbage files
+*.lib
+*.fas
