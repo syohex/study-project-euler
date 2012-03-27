@@ -28,28 +28,22 @@ sub p15 {
         return { %prime1 };
     };
 
-    my $prime1 = $prime_hash->($n + 1, 2 * $n);
-    my $prime2 = $prime_hash->(1, $n);
+    my $prime_denominator = $prime_hash->(1, $n);
+    my $prime_numerator   = $prime_hash->($n + 1, 2 * $n);
 
-    my %common_key;
-    map { $common_key{$_}++; } keys(%{$prime1}), keys(%{$prime2});
-
-    for my $key (grep { $common_key{$_} >= 2 } keys %common_key) {
-        if ($prime1->{$key} > $prime2->{$key}) {
-            $prime1->{$key} -= $prime2->{$key};
-            $prime2->{$key} = 0;
-        } else {
-            $prime2->{$key} -= $prime1->{$key};
-            $prime1->{$key} = 0;
-        }
+    for my $numerator (keys %{$prime_denominator}) {
+        die unless exists $prime_numerator->{$numerator};
+        $prime_numerator->{$numerator} -= $prime_denominator->{$numerator};
     }
 
-    use YAML; die YAML::Dump($prime1, $prime2);
-
-    my $a = 0;
-    while (my ($num, $power) = each %{$prime1}) {
-        $a += ($num ** $power);
+    my $patterns = 1;
+    while (my ($factor, $count) = each %{$prime_numerator}) {
+        $patterns *= ($factor ** $count);
     }
+
+    return $patterns;
 }
 
-p15(20);
+for my $i ( 1, 2, 20 ) {
+    printf "%d x %d = %d\n", $i, $i, p15($i);
+}
